@@ -2,7 +2,7 @@
 
 pkgname=xeve
 pkgver=0.5.0
-pkgrel=1
+pkgrel=2
 pkgdesc='MPEG-5 EVC (Essential Video Coding) encoder'
 arch=('x86_64')
 url='https://github.com/mpeg5/xeve/'
@@ -12,21 +12,21 @@ makedepends=('cmake')
 options=('!emptydirs')
 source=("https://github.com/mpeg5/xeve/archive/v${pkgver}/${pkgname}-${pkgver}.tar.gz"
         '010-xeve-disable-werror.patch'
-        '020-xeve-fix-pkg-config.patch'
-        '030-xeve-app-dynyamic-linking.patch')
+        '020-xeve-fix-pkg-config.patch')
 sha256sums=('4fb593921d2a0b48621f410ccd704d67d6ed1d08ab0aa7c5d5fef519ce596e8a'
             '8c4b607f34a5d39e824f86d00ab101849595cb49a2f67eed131487d658ec7206'
-            '68ae77132ec2b3dd8de641d16f3d7cc0de819ddb116484809445666b4d215187'
-            '93206033fdea10662d91145ae2883d801fc5a4228db456ad935fedea2488222a')
+            '68ae77132ec2b3dd8de641d16f3d7cc0de819ddb116484809445666b4d215187')
 
 prepare() {
     printf '%s\n' "v${pkgver}" > "${pkgname}-${pkgver}/version.txt"
     patch -d "${pkgname}-${pkgver}" -Np1 -i "${srcdir}/010-xeve-disable-werror.patch"
     patch -d "${pkgname}-${pkgver}" -Np1 -i "${srcdir}/020-xeve-fix-pkg-config.patch"
-    patch -d "${pkgname}-${pkgver}" -Np1 -i "${srcdir}/030-xeve-app-dynyamic-linking.patch"
 }
 
 build() {
+    # https://github.com/mpeg5/xeve/issues/108
+    export CFLAGS+=' -mno-avx'
+    
     cmake -B build -S "${pkgname}-${pkgver}" \
         -G 'Unix Makefiles' \
         -DCMAKE_BUILD_TYPE:STRING='None' \
